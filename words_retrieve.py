@@ -61,7 +61,7 @@ items = input('Please quote the word/phrase you want to check.\nExample1: \'mach
 start = time.time()
 if len(items) == 0: print('Error. Input is an empty string. Please try again.\n'); quit()
 if items == None: print('Wrong input format. Please try again.\n'); quit()
-data = ast.literal_eval(items)
+data = ast.literal_eval(items.lower())
 data_to_print = []
 legend_to_print = []
 summ_total = 0
@@ -136,15 +136,15 @@ colors = cm.rainbow(np.linspace(0.15, 1, len(all_words_norm)))
 ts = all_words_norm
 s = list(range(start_year, end_year+1, 1))
 # We set the appropriate scale for all the elements in the list
+maximum = []
+minimum = []
 for vals in ts:
 # The multiple entries case
     if isinstance(vals, list):
-        maximum = [max(ts[ii]) for ii in range(0, len(ts))]
-        minimum = [min(ts[ii]) for ii in range(0, len(ts))]
-        maximum = max(maximum)
-        minimum = min(minimum)
-        maximum = maximum + 0.1*maximum
-        minimum = minimum - 0.1*minimum
+        maximum.append(max(vals[8:]))
+        minimum.append(min(vals[8:]))
+        # maximum = max(maximum)
+        # minimum = min(minimum)
         for y, c in zip(ts, colors):
             plt.plot(s, y, linewidth=1.1, color=c)
 # The single enrtry case
@@ -155,17 +155,28 @@ for vals in ts:
         minimum = minimum - 0.1*minimum
         plt.plot(s, ts, 'b-', linewidth=1)
 
-if minimum < 0:
-    minimum = 0
+# if min(minimum) < 0:
+minimum = 0
+
+if isinstance(maximum, list):
+    maximu = max(maximum)
+else:
+    maximu = maximum
+    
+maximu = maximu + 0.1*maximu
+
+# for element in ts:
+#     print(element)
+
 
 # Here we set the parameters of the figure
 plt.xlabel('Year')
-plt.ylabel('Occurrence/pages')
+plt.ylabel('No. of words/page')
 plt.grid(True)
 # The legend position
 plt.legend(legend_to_print, loc = "upper left")
 # The range of the axes
-plt.axis([left_border, 2019, minimum, maximum])
+plt.axis([left_border, 2019, minimum, maximu])
 plt.savefig('figure.png', dpi=300)
 end = time.time()
 print('The calculation time:', round(end-start, 3))
